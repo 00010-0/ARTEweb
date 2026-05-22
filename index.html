@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ARTEweb — Estudio de diseño y desarrollo web</title>
 <meta name="description" content="ARTEweb. Estudio especializado en creación, diseño y mantenimiento de sitios web profesionales.">
 
@@ -34,48 +34,31 @@ tailwind.config = {
 
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-
-  html { scroll-behavior:smooth; }
+  html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
 
   body {
     font-family:'Inter Tight',sans-serif;
     background:#0a0a0c;
     color:#f4f1ea;
     overflow-x:hidden;
-    cursor:none;
     -webkit-font-smoothing:antialiased;
   }
 
-  .font-display {
-    letter-spacing:-0.04em;
-  }
+  .font-display { letter-spacing:-0.04em; }
 
   ::selection { background:#ff5722; color:#0a0a0c; }
 
-  /* Custom cursor */
-  .cursor-dot, .cursor-ring {
-    position:fixed; top:0; left:0; pointer-events:none; z-index:9999;
-    border-radius:50%; transform:translate(-50%,-50%);
-    mix-blend-mode:difference;
-  }
-  .cursor-dot { width:6px; height:6px; background:#fff; transition:transform .15s ease; }
-  .cursor-ring {
-    width:38px; height:38px; border:1px solid rgba(255,255,255,.6);
-    transition:transform .25s ease, width .25s ease, height .25s ease, border-color .25s ease;
-  }
-  .cursor-ring.hovering { width:64px; height:64px; border-color:#ff5722; }
-
-  @media (max-width:768px){
-    body{ cursor:auto; }
-    .cursor-dot,.cursor-ring{ display:none; }
+  /* Preloader */
+  #preBrand { transition:transform 1s cubic-bezier(.16,1,.3,1); }
+  #preloader.done {
+    transform:translateY(-100%);
+    transition:transform 1s cubic-bezier(.76,0,.24,1);
   }
 
   /* Canvas */
-  #bg-canvas {
-    position:fixed; top:0; left:0; width:100%; height:100vh; z-index:0;
-  }
+  #bg-canvas { position:fixed; top:0; left:0; width:100%; height:100vh; z-index:0; }
 
-  /* Grain overlay */
+  /* Grain */
   .grain {
     position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.04;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -83,18 +66,15 @@ tailwind.config = {
 
   .content { position:relative; z-index:2; }
 
-  /* Reveal animation */
   .reveal {
     opacity:0; transform:translateY(40px);
     transition:opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
   }
   .reveal.visible { opacity:1; transform:translateY(0); }
 
-  /* Marquee */
   .marquee { display:flex; white-space:nowrap; animation:scroll 30s linear infinite; }
   @keyframes scroll { from{transform:translateX(0);} to{transform:translateX(-50%);} }
 
-  /* Link underline */
   .nav-link { position:relative; }
   .nav-link::after {
     content:''; position:absolute; left:0; bottom:-4px; width:0; height:1px;
@@ -102,14 +82,10 @@ tailwind.config = {
   }
   .nav-link:hover::after { width:100%; }
 
-  /* Hero title char animation */
-  .char {
-    display:inline-block; opacity:0; transform:translateY(120%);
-    animation:charUp 1s cubic-bezier(.16,1,.3,1) forwards;
-  }
+  .char { display:inline-block; opacity:0; transform:translateY(120%); }
+  body.loaded .char { animation:charUp 1s cubic-bezier(.16,1,.3,1) forwards; }
   @keyframes charUp { to{ opacity:1; transform:translateY(0);} }
 
-  /* Service card */
   .service-card {
     transition:transform .5s cubic-bezier(.16,1,.3,1), background .5s ease;
     border-top:1px solid rgba(244,241,234,.12);
@@ -120,10 +96,7 @@ tailwind.config = {
   .service-arrow { opacity:0; transform:translateX(-20px); transition:all .4s ease; }
   .service-card:hover .service-arrow { opacity:1; transform:translateX(0); }
 
-  /* Magnetic button */
-  .btn-magnetic {
-    position:relative; overflow:hidden; transition:transform .3s ease;
-  }
+  .btn-magnetic { position:relative; overflow:hidden; transition:transform .3s ease; }
   .btn-magnetic span { position:relative; z-index:2; transition:color .4s ease; }
   .btn-magnetic::before {
     content:''; position:absolute; inset:0; background:#ff5722;
@@ -132,7 +105,6 @@ tailwind.config = {
   .btn-magnetic:hover::before { transform:translateY(0); }
   .btn-magnetic:hover span { color:#0a0a0c; }
 
-  /* Input */
   .field {
     background:transparent; border:none; border-bottom:1px solid rgba(244,241,234,.2);
     color:#f4f1ea; transition:border-color .3s ease; outline:none;
@@ -149,12 +121,43 @@ tailwind.config = {
 
   .method-btn.active { background:#ff5722; border-color:#ff5722; color:#0a0a0c; }
   .method-btn:not(.active):hover { border-color:rgba(244,241,234,.5); }
+
+  /* Language switch */
+  .lang-btn { transition:color .3s ease; }
+  .lang-btn.active { color:#ff5722; }
+
+  /* Mobile menu */
+  #mobileMenu {
+    transform:translateX(100%);
+    transition:transform .5s cubic-bezier(.76,0,.24,1);
+  }
+  #mobileMenu.open { transform:translateX(0); }
+  .burger span { transition:transform .3s ease, opacity .3s ease; }
+  .burger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2){ opacity:0; }
+  .burger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+  /* Mobile tuning */
+  @media (max-width:768px){
+    .marquee { animation-duration:18s; }
+    .grain { opacity:.03; }
+  }
 </style>
 </head>
 <body class="font-body">
 
-<div class="cursor-dot"></div>
-<div class="cursor-ring"></div>
+<!-- PRELOADER -->
+<div id="preloader" class="fixed inset-0 z-[10000] bg-ink flex flex-col items-center justify-center px-6">
+  <div class="overflow-hidden mb-6">
+    <div id="preBrand" class="font-display text-4xl md:text-7xl font-medium tracking-tight" style="transform:translateY(110%);">
+      ARTE<span class="font-light">web</span><span class="text-accent">.</span>
+    </div>
+  </div>
+  <div class="w-40 md:w-48 h-px bg-bone/15 overflow-hidden">
+    <div id="preBar" class="h-full bg-accent" style="width:0%;"></div>
+  </div>
+  <div id="preCount" class="font-display text-sm tracking-[0.3em] text-bone/40 mt-5">0</div>
+</div>
 
 <canvas id="bg-canvas"></canvas>
 <div class="grain"></div>
@@ -162,179 +165,247 @@ tailwind.config = {
 <div class="content">
 
   <!-- NAV -->
-  <nav class="fixed top-0 w-full z-40 px-6 md:px-12 py-6 flex justify-between items-center mix-blend-difference">
-    <a href="#top" class="font-display text-xl font-semibold tracking-tight">
+  <nav class="fixed top-0 w-full z-40 px-6 md:px-12 py-5 md:py-6 flex justify-between items-center">
+    <a href="#top" class="font-display text-xl font-semibold tracking-tight mix-blend-difference">
       ARTE<span class="font-light">web</span><span class="text-accent">.</span>
     </a>
-    <div class="hidden md:flex gap-10 text-sm font-medium tracking-wide">
-      <a href="#servicios" class="nav-link">Servicios</a>
-      <a href="#nosotros" class="nav-link">Estudio</a>
-      <a href="#contacto" class="nav-link">Contacto</a>
+
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-10 text-sm font-medium tracking-wide mix-blend-difference">
+      <a href="#servicios" class="nav-link" data-es="Servicios" data-en="Services">Servicios</a>
+      <a href="#nosotros" class="nav-link" data-es="Estudio" data-en="Studio">Estudio</a>
+      <a href="#proceso" class="nav-link" data-es="Proceso" data-en="Process">Proceso</a>
+      <a href="#contacto" class="nav-link" data-es="Contacto" data-en="Contact">Contacto</a>
     </div>
-    <a href="#contacto" class="md:hidden text-sm font-medium">Contacto</a>
+
+    <div class="flex items-center gap-5">
+      <!-- Language switch -->
+      <div class="flex items-center gap-1 text-sm font-medium mix-blend-difference">
+        <button class="lang-btn active" data-lang="es">ES</button>
+        <span class="text-bone/30">/</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <!-- Burger (mobile) -->
+      <button id="burger" class="burger md:hidden flex flex-col gap-[5px] w-7 mix-blend-difference" aria-label="Menú">
+        <span class="block h-[2px] w-full bg-bone"></span>
+        <span class="block h-[2px] w-full bg-bone"></span>
+        <span class="block h-[2px] w-full bg-bone"></span>
+      </button>
+    </div>
   </nav>
 
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="fixed inset-0 z-30 bg-ink flex flex-col justify-center px-8 md:hidden">
+    <a href="#servicios" class="mobile-link font-display text-4xl font-medium py-3 border-b border-bone/10" data-es="Servicios" data-en="Services">Servicios</a>
+    <a href="#nosotros" class="mobile-link font-display text-4xl font-medium py-3 border-b border-bone/10" data-es="Estudio" data-en="Studio">Estudio</a>
+    <a href="#proceso" class="mobile-link font-display text-4xl font-medium py-3 border-b border-bone/10" data-es="Proceso" data-en="Process">Proceso</a>
+    <a href="#contacto" class="mobile-link font-display text-4xl font-medium py-3 border-b border-bone/10" data-es="Contacto" data-en="Contact">Contacto</a>
+    <div class="mt-10 flex flex-col gap-3 text-bone/60">
+      <a href="https://wa.me/34691342480" target="_blank" rel="noopener">WhatsApp · 691 342 480</a>
+      <a href="mailto:ARTEweb@gmail.com">ARTEweb@gmail.com</a>
+    </div>
+  </div>
+
   <!-- HERO -->
-  <section id="top" class="min-h-screen flex flex-col justify-center px-6 md:px-12 relative">
+  <section id="top" class="min-h-screen flex flex-col justify-center px-6 md:px-12 relative pt-24 md:pt-0">
     <div class="max-w-7xl">
-      <div class="overflow-hidden mb-2">
-        <p class="text-sm md:text-base font-medium tracking-[0.3em] uppercase text-accent reveal">Estudio digital · Desde 2024</p>
+      <div class="overflow-hidden mb-3">
+        <p class="text-xs md:text-base font-medium tracking-[0.3em] uppercase text-accent reveal" data-es="Estudio digital · Desde 2024" data-en="Digital studio · Since 2024">Estudio digital · Desde 2024</p>
       </div>
-      <h1 class="font-display font-medium leading-[0.9] tracking-tight" style="font-size:clamp(3rem,11vw,11rem);">
+      <h1 class="font-display font-medium leading-[0.9] tracking-tight" style="font-size:clamp(2.75rem,11vw,11rem);">
         <span class="block" id="line1"></span>
         <span class="block outline-text" id="line2"></span>
       </h1>
-      <div class="mt-10 md:mt-14 max-w-xl reveal" style="transition-delay:.8s;">
-        <p class="text-lg md:text-xl font-light leading-relaxed text-bone/70">
+      <div class="mt-8 md:mt-14 max-w-xl reveal" style="transition-delay:.8s;">
+        <p class="text-base md:text-xl font-light leading-relaxed text-bone/70"
+           data-es="Diseñamos, desarrollamos y mantenemos sitios web que las marcas necesitan para destacar. Creatividad con propósito, tecnología sin fricción."
+           data-en="We design, build and maintain the websites brands need to stand out. Creativity with purpose, technology without friction.">
           Diseñamos, desarrollamos y mantenemos sitios web que las marcas necesitan para destacar. Creatividad con propósito, tecnología sin fricción.
         </p>
       </div>
-      <div class="mt-12 reveal" style="transition-delay:1s;">
-        <a href="#contacto" class="btn-magnetic inline-flex items-center gap-3 border border-bone/30 rounded-full px-8 py-4 font-medium text-sm tracking-wide" data-hover>
-          <span>Empezar un proyecto</span>
+      <div class="mt-10 md:mt-12 reveal" style="transition-delay:1s;">
+        <a href="#contacto" class="btn-magnetic inline-flex items-center gap-3 border border-bone/30 rounded-full px-7 md:px-8 py-4 font-medium text-sm tracking-wide" data-hover>
+          <span data-es="Empezar un proyecto" data-en="Start a project">Empezar un proyecto</span>
           <span class="text-lg leading-none">↗</span>
         </a>
       </div>
     </div>
 
-    <div class="absolute bottom-10 left-6 md:left-12 flex items-center gap-3 text-xs tracking-[0.2em] uppercase text-bone/40 reveal" style="transition-delay:1.2s;">
-      <span class="w-8 h-px bg-bone/40"></span>
-      Desliza para explorar
+    <div class="absolute bottom-8 md:bottom-10 left-6 md:left-12 flex items-center gap-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-bone/40 reveal" style="transition-delay:1.2s;">
+      <span class="w-6 md:w-8 h-px bg-bone/40"></span>
+      <span data-es="Desliza para explorar" data-en="Scroll to explore">Desliza para explorar</span>
     </div>
   </section>
 
   <!-- MARQUEE -->
-  <section class="py-8 border-y border-bone/10 overflow-hidden">
-    <div class="marquee font-display text-3xl md:text-5xl font-light">
-      <div class="flex items-center">
-        <span class="px-8">Diseño Web</span><span class="text-accent">·</span>
-        <span class="px-8">Desarrollo</span><span class="text-accent">·</span>
-        <span class="px-8">Mantenimiento</span><span class="text-accent">·</span>
-        <span class="px-8">Branding Digital</span><span class="text-accent">·</span>
-        <span class="px-8">UX / UI</span><span class="text-accent">·</span>
-      </div>
-      <div class="flex items-center" aria-hidden="true">
-        <span class="px-8">Diseño Web</span><span class="text-accent">·</span>
-        <span class="px-8">Desarrollo</span><span class="text-accent">·</span>
-        <span class="px-8">Mantenimiento</span><span class="text-accent">·</span>
-        <span class="px-8">Branding Digital</span><span class="text-accent">·</span>
-        <span class="px-8">UX / UI</span><span class="text-accent">·</span>
-      </div>
-    </div>
+  <section class="py-6 md:py-8 border-y border-bone/10 overflow-hidden">
+    <div class="marquee font-display text-2xl md:text-5xl font-light" id="marquee"></div>
   </section>
 
   <!-- SERVICIOS -->
-  <section id="servicios" class="px-6 md:px-12 py-24 md:py-40">
+  <section id="servicios" class="px-6 md:px-12 py-20 md:py-40">
     <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-6">
-        <h2 class="font-display font-medium tracking-tight reveal" style="font-size:clamp(2.5rem,6vw,5rem);">
-          Lo que<br>hacemos
-        </h2>
-        <p class="text-bone/50 max-w-sm font-light reveal" style="transition-delay:.2s;">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-24 gap-6">
+        <h2 class="font-display font-medium tracking-tight reveal" style="font-size:clamp(2.25rem,6vw,5rem);"
+            data-es="Lo que&lt;br&gt;hacemos" data-en="What we&lt;br&gt;do">Lo que<br>hacemos</h2>
+        <p class="text-bone/50 max-w-sm font-light reveal" style="transition-delay:.2s;"
+           data-es="Acompañamos cada proyecto de principio a fin: de la idea inicial al sitio en producción y su evolución continua."
+           data-en="We support every project from start to finish: from the first idea to the live site and its ongoing evolution.">
           Acompañamos cada proyecto de principio a fin: de la idea inicial al sitio en producción y su evolución continua.
         </p>
       </div>
 
       <div class="space-y-0">
-        <!-- 01 -->
-        <div class="service-card group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 py-10 md:py-14 reveal" data-hover>
-          <span class="service-num font-display text-2xl md:text-3xl font-light text-bone/40 w-20">01</span>
+        <div class="service-card group flex flex-col md:flex-row md:items-center gap-3 md:gap-12 py-8 md:py-14 reveal" data-hover>
+          <span class="service-num font-display text-xl md:text-3xl font-light text-bone/40 w-16 md:w-20">01</span>
           <div class="flex-1">
-            <h3 class="font-display text-3xl md:text-5xl font-medium mb-4">Diseño web</h3>
-            <p class="text-bone/50 font-light max-w-2xl">Interfaces a medida, pensadas para tu marca y tu audiencia. Diseño visual, prototipos y sistemas de identidad coherentes en cada pantalla.</p>
+            <h3 class="font-display text-2xl md:text-5xl font-medium mb-3 md:mb-4" data-es="Diseño web" data-en="Web design">Diseño web</h3>
+            <p class="text-bone/50 font-light max-w-2xl text-sm md:text-base"
+               data-es="Interfaces a medida, pensadas para tu marca y tu audiencia. Diseño visual, prototipos y sistemas de identidad coherentes en cada pantalla."
+               data-en="Custom interfaces built around your brand and your audience. Visual design, prototypes and identity systems consistent on every screen.">
+              Interfaces a medida, pensadas para tu marca y tu audiencia. Diseño visual, prototipos y sistemas de identidad coherentes en cada pantalla.</p>
           </div>
-          <span class="service-arrow text-accent text-4xl">↗</span>
+          <span class="service-arrow text-accent text-4xl hidden md:block">↗</span>
         </div>
-        <!-- 02 -->
-        <div class="service-card group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 py-10 md:py-14 reveal" data-hover>
-          <span class="service-num font-display text-2xl md:text-3xl font-light text-bone/40 w-20">02</span>
+        <div class="service-card group flex flex-col md:flex-row md:items-center gap-3 md:gap-12 py-8 md:py-14 reveal" data-hover>
+          <span class="service-num font-display text-xl md:text-3xl font-light text-bone/40 w-16 md:w-20">02</span>
           <div class="flex-1">
-            <h3 class="font-display text-3xl md:text-5xl font-medium mb-4">Desarrollo</h3>
-            <p class="text-bone/50 font-light max-w-2xl">Sitios rápidos, responsivos y construidos con las tecnologías actuales. Código limpio, rendimiento real y experiencias que funcionan en todos los dispositivos.</p>
+            <h3 class="font-display text-2xl md:text-5xl font-medium mb-3 md:mb-4" data-es="Desarrollo" data-en="Development">Desarrollo</h3>
+            <p class="text-bone/50 font-light max-w-2xl text-sm md:text-base"
+               data-es="Sitios rápidos, responsivos y construidos con las tecnologías actuales. Código limpio, rendimiento real y experiencias que funcionan en todos los dispositivos."
+               data-en="Fast, responsive sites built with modern technologies. Clean code, real performance and experiences that work on every device.">
+              Sitios rápidos, responsivos y construidos con las tecnologías actuales. Código limpio, rendimiento real y experiencias que funcionan en todos los dispositivos.</p>
           </div>
-          <span class="service-arrow text-accent text-4xl">↗</span>
+          <span class="service-arrow text-accent text-4xl hidden md:block">↗</span>
         </div>
-        <!-- 03 -->
-        <div class="service-card group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 py-10 md:py-14 reveal" data-hover>
-          <span class="service-num font-display text-2xl md:text-3xl font-light text-bone/40 w-20">03</span>
+        <div class="service-card group flex flex-col md:flex-row md:items-center gap-3 md:gap-12 py-8 md:py-14 reveal" data-hover>
+          <span class="service-num font-display text-xl md:text-3xl font-light text-bone/40 w-16 md:w-20">03</span>
           <div class="flex-1">
-            <h3 class="font-display text-3xl md:text-5xl font-medium mb-4">Mantenimiento</h3>
-            <p class="text-bone/50 font-light max-w-2xl">Tu sitio siempre seguro, actualizado y al día. Soporte continuo, mejoras y monitorización para que nunca tengas que preocuparte por nada técnico.</p>
+            <h3 class="font-display text-2xl md:text-5xl font-medium mb-3 md:mb-4" data-es="Mantenimiento" data-en="Maintenance">Mantenimiento</h3>
+            <p class="text-bone/50 font-light max-w-2xl text-sm md:text-base"
+               data-es="Tu sitio siempre seguro, actualizado y al día. Soporte continuo, mejoras y monitorización para que nunca tengas que preocuparte por nada técnico."
+               data-en="Your site always secure, updated and current. Ongoing support, improvements and monitoring so you never have to worry about anything technical.">
+              Tu sitio siempre seguro, actualizado y al día. Soporte continuo, mejoras y monitorización para que nunca tengas que preocuparte por nada técnico.</p>
           </div>
-          <span class="service-arrow text-accent text-4xl">↗</span>
+          <span class="service-arrow text-accent text-4xl hidden md:block">↗</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- NOSOTROS / FEATURES -->
-  <section id="nosotros" class="px-6 md:px-12 py-24 md:py-40 border-t border-bone/10">
+  <!-- NOSOTROS -->
+  <section id="nosotros" class="px-6 md:px-12 py-20 md:py-40 border-t border-bone/10">
     <div class="max-w-7xl mx-auto">
-      <div class="grid md:grid-cols-12 gap-12">
+      <div class="grid md:grid-cols-12 gap-8 md:gap-12">
         <div class="md:col-span-5">
-          <p class="text-sm font-medium tracking-[0.3em] uppercase text-accent mb-8 reveal">El estudio</p>
-          <h2 class="font-display font-medium tracking-tight leading-tight reveal" style="font-size:clamp(2rem,4.5vw,3.5rem); transition-delay:.1s;">
+          <p class="text-sm font-medium tracking-[0.3em] uppercase text-accent mb-6 md:mb-8 reveal" data-es="El estudio" data-en="The studio">El estudio</p>
+          <h2 class="font-display font-medium tracking-tight leading-tight reveal" style="font-size:clamp(1.9rem,4.5vw,3.5rem); transition-delay:.1s;"
+              data-es="Convertimos ideas en presencia digital" data-en="We turn ideas into digital presence">
             Convertimos ideas en presencia digital
           </h2>
         </div>
         <div class="md:col-span-7 md:pl-12">
-          <p class="text-xl font-light leading-relaxed text-bone/70 mb-16 reveal" style="transition-delay:.2s;">
+          <p class="text-lg md:text-xl font-light leading-relaxed text-bone/70 mb-10 md:mb-16 reveal" style="transition-delay:.2s;"
+             data-es="En ARTEweb creemos que cada marca merece una web a su altura. No usamos plantillas genéricas: cada proyecto se diseña, se construye y se cuida de forma artesanal."
+             data-en="At ARTEweb we believe every brand deserves a website to match. No generic templates: each project is designed, built and cared for by hand.">
             En ARTEweb creemos que cada marca merece una web a su altura. No usamos plantillas genéricas: cada proyecto se diseña, se construye y se cuida de forma artesanal.
           </p>
 
-          <div class="feature-row py-8 grid grid-cols-1 md:grid-cols-2 gap-2 reveal">
-            <h3 class="font-display text-xl font-medium">Diseño a medida</h3>
-            <p class="text-bone/50 font-light">Nada de plantillas. Cada pixel responde a tu identidad y tus objetivos.</p>
+          <div class="feature-row py-6 md:py-8 grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 reveal">
+            <h3 class="font-display text-lg md:text-xl font-medium" data-es="Diseño a medida" data-en="Custom design">Diseño a medida</h3>
+            <p class="text-bone/50 font-light text-sm md:text-base" data-es="Nada de plantillas. Cada pixel responde a tu identidad y tus objetivos." data-en="No templates. Every pixel responds to your identity and goals.">Nada de plantillas. Cada pixel responde a tu identidad y tus objetivos.</p>
           </div>
-          <div class="feature-row py-8 grid grid-cols-1 md:grid-cols-2 gap-2 reveal">
-            <h3 class="font-display text-xl font-medium">Tecnología moderna</h3>
-            <p class="text-bone/50 font-light">Las mejores herramientas para garantizar velocidad, seguridad y escalabilidad.</p>
+          <div class="feature-row py-6 md:py-8 grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 reveal">
+            <h3 class="font-display text-lg md:text-xl font-medium" data-es="Tecnología moderna" data-en="Modern technology">Tecnología moderna</h3>
+            <p class="text-bone/50 font-light text-sm md:text-base" data-es="Las mejores herramientas para garantizar velocidad, seguridad y escalabilidad." data-en="The best tools to guarantee speed, security and scalability.">Las mejores herramientas para garantizar velocidad, seguridad y escalabilidad.</p>
           </div>
-          <div class="feature-row py-8 grid grid-cols-1 md:grid-cols-2 gap-2 reveal">
-            <h3 class="font-display text-xl font-medium">Soporte cercano</h3>
-            <p class="text-bone/50 font-light">Trato directo y personal. Estamos contigo antes, durante y después del lanzamiento.</p>
+          <div class="feature-row py-6 md:py-8 grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 reveal">
+            <h3 class="font-display text-lg md:text-xl font-medium" data-es="Soporte cercano" data-en="Close support">Soporte cercano</h3>
+            <p class="text-bone/50 font-light text-sm md:text-base" data-es="Trato directo y personal. Estamos contigo antes, durante y después del lanzamiento." data-en="Direct, personal care. We're with you before, during and after launch.">Trato directo y personal. Estamos contigo antes, durante y después del lanzamiento.</p>
           </div>
-          <div class="feature-row py-8 grid grid-cols-1 md:grid-cols-2 gap-2 reveal">
-            <h3 class="font-display text-xl font-medium">Resultados reales</h3>
-            <p class="text-bone/50 font-light">Webs pensadas para destacar, convertir y crecer con tu negocio.</p>
+          <div class="feature-row py-6 md:py-8 grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 reveal">
+            <h3 class="font-display text-lg md:text-xl font-medium" data-es="Resultados reales" data-en="Real results">Resultados reales</h3>
+            <p class="text-bone/50 font-light text-sm md:text-base" data-es="Webs pensadas para destacar, convertir y crecer con tu negocio." data-en="Websites built to stand out, convert and grow with your business.">Webs pensadas para destacar, convertir y crecer con tu negocio.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA / CONTACTO -->
-  <section id="contacto" class="px-6 md:px-12 py-24 md:py-40 border-t border-bone/10">
+  <!-- PROCESO -->
+  <section id="proceso" class="px-6 md:px-12 py-20 md:py-40 border-t border-bone/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-24 gap-6">
+        <h2 class="font-display font-medium tracking-tight reveal" style="font-size:clamp(2.25rem,6vw,5rem);"
+            data-es="Cómo&lt;br&gt;trabajamos" data-en="How we&lt;br&gt;work">Cómo<br>trabajamos</h2>
+        <p class="text-bone/50 max-w-sm font-light reveal" style="transition-delay:.2s;"
+           data-es="Un método claro y sin sorpresas. Sabes en todo momento en qué punto está tu proyecto."
+           data-en="A clear method with no surprises. You always know exactly where your project stands.">
+          Un método claro y sin sorpresas. Sabes en todo momento en qué punto está tu proyecto.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-bone/10 border border-bone/10 rounded-2xl overflow-hidden">
+        <div class="bg-ink p-7 md:p-10 reveal">
+          <span class="font-display text-sm text-accent tracking-[0.2em]">01</span>
+          <h3 class="font-display text-xl md:text-2xl font-medium mt-5 md:mt-6 mb-2 md:mb-3" data-es="Escuchamos" data-en="We listen">Escuchamos</h3>
+          <p class="text-bone/50 font-light text-sm leading-relaxed" data-es="Hablamos de tu idea, tus objetivos y tu marca para entender qué necesitas de verdad." data-en="We talk through your idea, goals and brand to understand what you really need.">Hablamos de tu idea, tus objetivos y tu marca para entender qué necesitas de verdad.</p>
+        </div>
+        <div class="bg-ink p-7 md:p-10 reveal" style="transition-delay:.1s;">
+          <span class="font-display text-sm text-accent tracking-[0.2em]">02</span>
+          <h3 class="font-display text-xl md:text-2xl font-medium mt-5 md:mt-6 mb-2 md:mb-3" data-es="Diseñamos" data-en="We design">Diseñamos</h3>
+          <p class="text-bone/50 font-light text-sm leading-relaxed" data-es="Creamos una propuesta visual a medida y la refinamos contigo hasta que sea perfecta." data-en="We create a custom visual proposal and refine it with you until it's perfect.">Creamos una propuesta visual a medida y la refinamos contigo hasta que sea perfecta.</p>
+        </div>
+        <div class="bg-ink p-7 md:p-10 reveal" style="transition-delay:.2s;">
+          <span class="font-display text-sm text-accent tracking-[0.2em]">03</span>
+          <h3 class="font-display text-xl md:text-2xl font-medium mt-5 md:mt-6 mb-2 md:mb-3" data-es="Desarrollamos" data-en="We build">Desarrollamos</h3>
+          <p class="text-bone/50 font-light text-sm leading-relaxed" data-es="Convertimos el diseño en un sitio real, rápido y funcional en todos los dispositivos." data-en="We turn the design into a real, fast site that works on every device.">Convertimos el diseño en un sitio real, rápido y funcional en todos los dispositivos.</p>
+        </div>
+        <div class="bg-ink p-7 md:p-10 reveal" style="transition-delay:.3s;">
+          <span class="font-display text-sm text-accent tracking-[0.2em]">04</span>
+          <h3 class="font-display text-xl md:text-2xl font-medium mt-5 md:mt-6 mb-2 md:mb-3" data-es="Cuidamos" data-en="We maintain">Cuidamos</h3>
+          <p class="text-bone/50 font-light text-sm leading-relaxed" data-es="Lanzamos tu web y la mantenemos al día con soporte y mejoras continuas." data-en="We launch your site and keep it up to date with ongoing support and improvements.">Lanzamos tu web y la mantenemos al día con soporte y mejoras continuas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="px-6 md:px-12 py-20 md:py-40 border-t border-bone/10">
     <div class="max-w-7xl mx-auto">
       <div class="grid md:grid-cols-12 gap-12 md:gap-20">
         <div class="md:col-span-6">
-          <p class="text-sm font-medium tracking-[0.3em] uppercase text-accent mb-8 reveal">Hablemos</p>
-          <h2 class="font-display font-medium tracking-tight leading-[0.95] reveal" style="font-size:clamp(2.5rem,7vw,6rem); transition-delay:.1s;">
+          <p class="text-sm font-medium tracking-[0.3em] uppercase text-accent mb-6 md:mb-8 reveal" data-es="Hablemos" data-en="Let's talk">Hablemos</p>
+          <h2 class="font-display font-medium tracking-tight leading-[0.95] reveal" style="font-size:clamp(2.25rem,7vw,6rem); transition-delay:.1s;"
+              data-es="¿Tienes un&lt;br&gt;proyecto&lt;br&gt;en mente&lt;span class=&quot;text-accent&quot;&gt;?&lt;/span&gt;"
+              data-en="Got a&lt;br&gt;project in&lt;br&gt;mind&lt;span class=&quot;text-accent&quot;&gt;?&lt;/span&gt;">
             ¿Tienes un<br>proyecto<br>en mente<span class="text-accent">?</span>
           </h2>
-          <p class="mt-10 text-lg font-light text-bone/60 max-w-md reveal" style="transition-delay:.2s;">
+          <p class="mt-8 md:mt-10 text-base md:text-lg font-light text-bone/60 max-w-md reveal" style="transition-delay:.2s;"
+             data-es="Cuéntanos qué necesitas y te responderemos lo antes posible. Sin compromiso."
+             data-en="Tell us what you need and we'll get back to you as soon as possible. No commitment.">
             Cuéntanos qué necesitas y te responderemos lo antes posible. Sin compromiso.
           </p>
 
-          <div class="mt-12 space-y-4 reveal" style="transition-delay:.3s;">
-            <a href="https://wa.me/34691342480" target="_blank" rel="noopener" class="group flex items-center gap-4 border border-bone/15 rounded-2xl px-6 py-5 hover:border-accent/50 transition-colors duration-300" data-hover>
-              <span class="text-2xl text-accent">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/></svg>
+          <div class="mt-10 md:mt-12 space-y-4 reveal" style="transition-delay:.3s;">
+            <a href="https://wa.me/34691342480" target="_blank" rel="noopener" class="group flex items-center gap-4 border border-bone/15 rounded-2xl px-5 md:px-6 py-4 md:py-5 hover:border-accent/50 transition-colors duration-300" data-hover>
+              <span class="text-accent">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/></svg>
               </span>
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <p class="text-xs tracking-[0.2em] uppercase text-bone/40">WhatsApp</p>
-                <p class="text-lg font-medium group-hover:text-accent transition-colors">691 342 480</p>
+                <p class="text-base md:text-lg font-medium group-hover:text-accent transition-colors">691 342 480</p>
               </div>
               <span class="text-accent text-2xl opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
             </a>
 
-            <a href="mailto:ARTEweb@gmail.com" class="group flex items-center gap-4 border border-bone/15 rounded-2xl px-6 py-5 hover:border-accent/50 transition-colors duration-300" data-hover>
-              <span class="text-2xl text-accent">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+            <a href="mailto:ARTEweb@gmail.com" class="group flex items-center gap-4 border border-bone/15 rounded-2xl px-5 md:px-6 py-4 md:py-5 hover:border-accent/50 transition-colors duration-300" data-hover>
+              <span class="text-accent">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
               </span>
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <p class="text-xs tracking-[0.2em] uppercase text-bone/40">Email</p>
-                <p class="text-lg font-medium group-hover:text-accent transition-colors">ARTEweb@gmail.com</p>
+                <p class="text-base md:text-lg font-medium group-hover:text-accent transition-colors truncate">ARTEweb@gmail.com</p>
               </div>
               <span class="text-accent text-2xl opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
             </a>
@@ -342,40 +413,40 @@ tailwind.config = {
         </div>
 
         <div class="md:col-span-6 md:pt-4">
-          <form id="contactForm" class="space-y-10 reveal" style="transition-delay:.2s;">
+          <form id="contactForm" class="space-y-8 md:space-y-10 reveal" style="transition-delay:.2s;">
             <div>
-              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3">Nombre</label>
-              <input type="text" name="nombre" required placeholder="Tu nombre" class="field w-full pb-3 text-lg">
+              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3" data-es="Nombre" data-en="Name">Nombre</label>
+              <input type="text" name="nombre" required data-es-ph="Tu nombre" data-en-ph="Your name" placeholder="Tu nombre" class="field w-full pb-3 text-lg">
             </div>
             <div>
               <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3">Email</label>
-              <input type="email" name="email" required placeholder="tu@email.com" class="field w-full pb-3 text-lg">
+              <input type="email" name="email" required data-es-ph="tu@email.com" data-en-ph="you@email.com" placeholder="tu@email.com" class="field w-full pb-3 text-lg">
             </div>
             <div>
-              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3">Empresa <span class="lowercase tracking-normal">(opcional)</span></label>
-              <input type="text" name="empresa" placeholder="Nombre de tu empresa" class="field w-full pb-3 text-lg">
+              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3"><span data-es="Empresa" data-en="Company">Empresa</span> <span class="lowercase tracking-normal" data-es="(opcional)" data-en="(optional)">(opcional)</span></label>
+              <input type="text" name="empresa" data-es-ph="Nombre de tu empresa" data-en-ph="Your company name" placeholder="Nombre de tu empresa" class="field w-full pb-3 text-lg">
             </div>
             <div>
-              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3">Cuéntanos</label>
-              <textarea name="mensaje" required rows="3" placeholder="¿Qué proyecto tienes en mente?" class="field w-full pb-3 text-lg resize-none"></textarea>
+              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-3" data-es="Cuéntanos" data-en="Tell us">Cuéntanos</label>
+              <textarea name="mensaje" required rows="3" data-es-ph="¿Qué proyecto tienes en mente?" data-en-ph="What project do you have in mind?" placeholder="¿Qué proyecto tienes en mente?" class="field w-full pb-3 text-lg resize-none"></textarea>
             </div>
             <div>
-              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-4">¿Cómo prefieres enviarlo?</label>
+              <label class="block text-xs tracking-[0.2em] uppercase text-bone/40 mb-4" data-es="¿Cómo prefieres enviarlo?" data-en="How would you like to send it?">¿Cómo prefieres enviarlo?</label>
               <div class="flex gap-3">
-                <button type="button" id="btnWhats" class="method-btn flex-1 flex items-center justify-center gap-2 border border-bone/20 rounded-full px-5 py-3 text-sm font-medium transition-colors duration-300" data-method="whatsapp" data-hover>
+                <button type="button" id="btnWhats" class="method-btn flex-1 flex items-center justify-center gap-2 border border-bone/20 rounded-full px-4 md:px-5 py-3 text-sm font-medium transition-colors duration-300" data-method="whatsapp" data-hover>
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/></svg>
                   WhatsApp
                 </button>
-                <button type="button" id="btnMail" class="method-btn flex-1 flex items-center justify-center gap-2 border border-bone/20 rounded-full px-5 py-3 text-sm font-medium transition-colors duration-300" data-method="email" data-hover>
+                <button type="button" id="btnMail" class="method-btn flex-1 flex items-center justify-center gap-2 border border-bone/20 rounded-full px-4 md:px-5 py-3 text-sm font-medium transition-colors duration-300" data-method="email" data-hover>
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
                   Email
                 </button>
               </div>
             </div>
             <button type="submit" class="btn-magnetic w-full md:w-auto border border-bone/30 rounded-full px-10 py-5 font-medium tracking-wide" data-hover>
-              <span class="flex items-center justify-center gap-3">Enviar mensaje <span class="text-lg">↗</span></span>
+              <span class="flex items-center justify-center gap-3"><span data-es="Enviar mensaje" data-en="Send message">Enviar mensaje</span> <span class="text-lg">↗</span></span>
             </button>
-            <p id="formMsg" class="text-sm text-accent hidden">¡Gracias! Abriendo tu app para enviar el mensaje…</p>
+            <p id="formMsg" class="text-sm text-accent hidden" data-es="¡Gracias! Abriendo tu app para enviar el mensaje…" data-en="Thanks! Opening your app to send the message…">¡Gracias! Abriendo tu app para enviar el mensaje…</p>
           </form>
         </div>
       </div>
@@ -383,16 +454,16 @@ tailwind.config = {
   </section>
 
   <!-- FOOTER -->
-  <footer class="px-6 md:px-12 py-12 border-t border-bone/10">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+  <footer class="px-6 md:px-12 py-10 md:py-12 border-t border-bone/10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8">
       <div>
-        <a href="#top" class="font-display text-3xl font-semibold tracking-tight">ARTE<span class="font-light">web</span><span class="text-accent">.</span></a>
-        <p class="text-bone/40 text-sm mt-2 font-light">Creación, diseño y mantenimiento web.</p>
+        <a href="#top" class="font-display text-2xl md:text-3xl font-semibold tracking-tight">ARTE<span class="font-light">web</span><span class="text-accent">.</span></a>
+        <p class="text-bone/40 text-sm mt-2 font-light" data-es="Creación, diseño y mantenimiento web." data-en="Web creation, design and maintenance.">Creación, diseño y mantenimiento web.</p>
       </div>
       <div class="flex flex-col md:items-end gap-2 text-sm text-bone/50">
         <a href="https://wa.me/34691342480" target="_blank" rel="noopener" class="nav-link">WhatsApp · 691 342 480 ↗</a>
         <a href="mailto:ARTEweb@gmail.com" class="nav-link">ARTEweb@gmail.com ↗</a>
-        <p class="text-bone/30 mt-2">© 2024 ARTEweb. Todos los derechos reservados.</p>
+        <p class="text-bone/30 mt-2">© 2024 ARTEweb. <span data-es="Todos los derechos reservados." data-en="All rights reserved.">Todos los derechos reservados.</span></p>
       </div>
     </div>
   </footer>
@@ -400,19 +471,50 @@ tailwind.config = {
 </div>
 
 <script>
-/* ---------- Custom cursor ---------- */
-const dot = document.querySelector('.cursor-dot');
-const ring = document.querySelector('.cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-window.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
-function loopCursor(){ rx+=(mx-rx)*0.18; ry+=(my-ry)*0.18; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loopCursor); }
-loopCursor();
-document.querySelectorAll('[data-hover], a, button').forEach(el=>{
-  el.addEventListener('mouseenter',()=>ring.classList.add('hovering'));
-  el.addEventListener('mouseleave',()=>ring.classList.remove('hovering'));
-});
+/* ---------- Preloader ---------- */
+const preloader = document.getElementById('preloader');
+const preBar = document.getElementById('preBar');
+const preCount = document.getElementById('preCount');
+const preBrand = document.getElementById('preBrand');
+setTimeout(()=>{ preBrand.style.transform='translateY(0)'; }, 100);
+let prog = 0;
+const preInt = setInterval(()=>{
+  prog += Math.random()*8 + 3;
+  if(prog >= 100){ prog = 100; clearInterval(preInt); finishPreloader(); }
+  preBar.style.width = prog + '%';
+  preCount.textContent = Math.floor(prog);
+}, 90);
+function finishPreloader(){
+  setTimeout(()=>{
+    preloader.classList.add('done');
+    document.body.classList.add('loaded');
+    setTimeout(()=>preloader.remove(), 1100);
+  }, 350);
+}
 
-/* ---------- Hero text split ---------- */
+/* ---------- Language ---------- */
+const heroLines = { es:['Creamos webs','extraordinarias'], en:['We build','extraordinary sites'] };
+const marqueeWords = {
+  es:['Diseño Web','Desarrollo','Mantenimiento','Branding Digital','UX / UI'],
+  en:['Web Design','Development','Maintenance','Digital Branding','UX / UI']
+};
+let currentLang = 'es';
+
+function buildMarquee(lang){
+  const m = document.getElementById('marquee');
+  const make = ()=>{
+    const wrap = document.createElement('div');
+    wrap.className='flex items-center';
+    marqueeWords[lang].forEach(w=>{
+      const s=document.createElement('span'); s.className='px-6 md:px-8'; s.textContent=w; wrap.appendChild(s);
+      const d=document.createElement('span'); d.className='text-accent'; d.textContent='·'; wrap.appendChild(d);
+    });
+    return wrap;
+  };
+  m.innerHTML=''; m.appendChild(make());
+  const dup = make(); dup.setAttribute('aria-hidden','true'); m.appendChild(dup);
+}
+
 function splitText(el, text, baseDelay){
   el.innerHTML='';
   [...text].forEach((ch,i)=>{
@@ -423,36 +525,68 @@ function splitText(el, text, baseDelay){
     el.appendChild(span);
   });
 }
-splitText(document.getElementById('line1'),'Creamos webs', 0.2);
-splitText(document.getElementById('line2'),'extraordinarias', 0.5);
+
+function setLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-es]').forEach(el=>{
+    const val = el.getAttribute('data-'+lang);
+    if(val!==null) el.innerHTML = val.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+  });
+  document.querySelectorAll('[data-es-ph]').forEach(el=>{
+    const val = el.getAttribute('data-'+lang+'-ph');
+    if(val!==null) el.placeholder = val;
+  });
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+  buildMarquee(lang);
+  splitText(document.getElementById('line1'), heroLines[lang][0], 0.2);
+  splitText(document.getElementById('line2'), heroLines[lang][1], 0.5);
+}
+document.querySelectorAll('.lang-btn').forEach(b=>{
+  b.addEventListener('click',()=>setLang(b.dataset.lang));
+});
+setLang('es');
+
+/* ---------- Mobile menu ---------- */
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+function toggleMenu(force){
+  const open = force!==undefined ? force : !mobileMenu.classList.contains('open');
+  mobileMenu.classList.toggle('open', open);
+  burger.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+burger.addEventListener('click',()=>toggleMenu());
+document.querySelectorAll('.mobile-link, #mobileMenu a').forEach(a=>{
+  a.addEventListener('click',()=>toggleMenu(false));
+});
 
 /* ---------- Reveal on scroll ---------- */
 const io = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} });
-},{threshold:0.15});
+},{threshold:0.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
 /* ---------- Three.js fluid particle field ---------- */
+const isMobile = window.matchMedia('(max-width:768px)').matches;
 const canvas = document.getElementById('bg-canvas');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
 camera.position.z = 60;
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+const renderer = new THREE.WebGLRenderer({canvas, antialias:!isMobile, alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile?1.5:2));
 
-const COUNT = 1400;
+const COUNT = isMobile ? 650 : 1400;
 const positions = new Float32Array(COUNT*3);
 const base = new Float32Array(COUNT*3);
 for(let i=0;i<COUNT;i++){
   const r = 38 + Math.random()*18;
   const theta = Math.random()*Math.PI*2;
   const phi = Math.acos(2*Math.random()-1);
-  const x = r*Math.sin(phi)*Math.cos(theta);
-  const y = r*Math.sin(phi)*Math.sin(theta);
-  const z = r*Math.cos(phi);
-  positions[i*3]=x; positions[i*3+1]=y; positions[i*3+2]=z;
-  base[i*3]=x; base[i*3+1]=y; base[i*3+2]=z;
+  positions[i*3]=base[i*3]=r*Math.sin(phi)*Math.cos(theta);
+  positions[i*3+1]=base[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
+  positions[i*3+2]=base[i*3+2]=r*Math.cos(phi);
 }
 const geo = new THREE.BufferGeometry();
 geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
@@ -468,51 +602,42 @@ const sprite = (()=> {
   return new THREE.CanvasTexture(c);
 })();
 
-const mat = new THREE.PointsMaterial({
-  size:1.1, map:sprite, transparent:true, opacity:0.85,
-  depthWrite:false, blending:THREE.AdditiveBlending, color:0xff5722
-});
+const mat = new THREE.PointsMaterial({size:1.1, map:sprite, transparent:true, opacity:0.85, depthWrite:false, blending:THREE.AdditiveBlending, color:0xff5722});
 const points = new THREE.Points(geo, mat);
 scene.add(points);
-
-const mat2 = new THREE.PointsMaterial({
-  size:0.7, map:sprite, transparent:true, opacity:0.5,
-  depthWrite:false, blending:THREE.AdditiveBlending, color:0x3d5afe
-});
+const mat2 = new THREE.PointsMaterial({size:0.7, map:sprite, transparent:true, opacity:0.5, depthWrite:false, blending:THREE.AdditiveBlending, color:0x3d5afe});
 const points2 = new THREE.Points(geo.clone(), mat2);
 points2.scale.set(1.15,1.15,1.15);
 scene.add(points2);
 
 let mouseX=0, mouseY=0, tx=0, ty=0;
-window.addEventListener('mousemove',e=>{
-  mouseX=(e.clientX/window.innerWidth-0.5);
-  mouseY=(e.clientY/window.innerHeight-0.5);
-});
+window.addEventListener('mousemove',e=>{ mouseX=(e.clientX/window.innerWidth-0.5); mouseY=(e.clientY/window.innerHeight-0.5); });
 
 let scrollY=0;
 window.addEventListener('scroll',()=>{ scrollY=window.scrollY; });
+
+let pulse = 0;
+window.addEventListener('click',()=>{ pulse = 1; });
 
 const clock = new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
+  pulse *= 0.94;
+  const expand = 1 + pulse*0.35;
   const pos = geo.attributes.position.array;
   for(let i=0;i<COUNT;i++){
     const ix=i*3;
     const wave = Math.sin(t*0.6 + base[ix]*0.1 + base[ix+1]*0.1)*1.4;
-    pos[ix]   = base[ix]   + Math.sin(t*0.3 + i)*0.6;
-    pos[ix+1] = base[ix+1] + Math.cos(t*0.4 + i)*0.6;
-    pos[ix+2] = base[ix+2] + wave;
+    pos[ix]   = (base[ix]   + Math.sin(t*0.3 + i)*0.6) * expand;
+    pos[ix+1] = (base[ix+1] + Math.cos(t*0.4 + i)*0.6) * expand;
+    pos[ix+2] = (base[ix+2] + wave) * expand;
   }
   geo.attributes.position.needsUpdate = true;
-
   tx += (mouseX*0.6 - tx)*0.05;
   ty += (mouseY*0.6 - ty)*0.05;
-  points.rotation.y = t*0.04 + tx;
-  points.rotation.x = ty;
-  points2.rotation.y = -t*0.03 - tx*0.8;
-  points2.rotation.x = -ty*0.8;
-
+  points.rotation.y = t*0.04 + tx; points.rotation.x = ty;
+  points2.rotation.y = -t*0.03 - tx*0.8; points2.rotation.x = -ty*0.8;
   camera.position.z = 60 + scrollY*0.01;
   renderer.render(scene,camera);
 }
@@ -527,11 +652,9 @@ window.addEventListener('resize',()=>{
 /* ---------- Form: WhatsApp + Email ---------- */
 const WHATSAPP_NUMBER = '34691342480';
 const EMAIL_TO = 'ARTEweb@gmail.com';
-
 let selectedMethod = 'whatsapp';
 const btnWhats = document.getElementById('btnWhats');
 const btnMail = document.getElementById('btnMail');
-
 function setMethod(m){
   selectedMethod = m;
   btnWhats.classList.toggle('active', m==='whatsapp');
@@ -546,7 +669,6 @@ document.getElementById('contactForm').addEventListener('submit',function(e){
   const f=e.target;
   const nombre=f.nombre.value, email=f.email.value, empresa=f.empresa.value, mensaje=f.mensaje.value;
   document.getElementById('formMsg').classList.remove('hidden');
-
   if(selectedMethod==='whatsapp'){
     const texto = '*Nuevo proyecto — ARTEweb*%0A%0A'
       + '*Nombre:* '+encodeURIComponent(nombre)+'%0A'
